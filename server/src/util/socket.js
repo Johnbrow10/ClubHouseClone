@@ -1,10 +1,33 @@
 import http from "http";
 import { Server } from "socket.io";
+import { constants } from "./constants.js";
 
 export default class SocketServer {
   #io;
   constructor({ port }) {
     this.port = port;
+    this.namespaces = {};
+  }
+
+  attachEvents({ routeConfig }) {
+    for (const routes of routeConfig) {
+      for (const [namespace, { events, eventEmitter }] of Object.entries(
+        routes
+      )) {
+        // criar a rota para servidor
+        const route = (this.namespaces[namespace] = this.#io.of(
+          `/${namespace}`
+        ));
+
+        route.on("connection", (socket) => {
+          for (const [functionName, functionValue] of events) {
+            socket.on(functionName, (...args) => functionValue(socket,...args) );
+          }
+
+          eventEmitter.emit(constants.event.USER_CONNECTED, socket)
+        });
+      }
+    }
   }
 
   //  criando o servidor com a api http do node
@@ -25,15 +48,6 @@ export default class SocketServer {
         credentials: false,
       },
     });
-
-    // crair a room para ativar o servidor socket na room
-    // const room = this.#io.of("/room");
-    // room.on("connection", (socket) => {
-    //   socket.emit("userConnection", "socket id se conectou " + socket.id);
-    //   socket.on("joinRoom", (dados) => {
-    //     console.log("dados recebidos", dados);
-    //   });
-    // });
 
     // no retorno verfica se tem erro
     return new Promise((resolve, reject) => {
