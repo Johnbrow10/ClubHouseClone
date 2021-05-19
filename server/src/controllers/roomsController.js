@@ -1,3 +1,5 @@
+import { constants } from "../util/constants.js";
+
 export default class RoomsController {
   constructor() {}
 
@@ -6,12 +8,18 @@ export default class RoomsController {
     console.log("connection stabelished with", id);
   }
 
+  joinRoom(socket, data) {
+    console.log("dados recebidos", data);
+
+    socket.emit(constants.event.USER_CONNECTED, data);
+  }
+
   //  capturar as funcoes publicas e privadas da classe
   getEvents() {
     // Usando o reflext para pegar as chaves das funcoes de RoomController
     const functions = Reflect.ownKeys(RoomsController.prototype)
       .filter((fn) => fn !== "constructor")
-      .map(name, [
+      .map((name) => [
         name,
         this[name].bind(this),
       ]); /* vai mandar primeiro o nome da funcao
