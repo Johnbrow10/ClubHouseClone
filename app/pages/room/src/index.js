@@ -2,6 +2,7 @@ import { constants } from "../../_shared/constants.js";
 import SocketBuilder from "../../_shared/sockeBuilder.js";
 
 
+
 // Trazendo a importcao d oservidor na sala
 const socketBuilder = new SocketBuilder({
   socketUrl: constants.socketUrl,
@@ -13,8 +14,6 @@ const socket = socketBuilder
   .setOnUserDisconnected((user) => console.log("user disconnected!", user))
   .build();
 
-socket.emit(constants.events.JOIN_ROOM, { user, room });
-
 const room = {
   id: Date.now(),
   topic: "JS Expert éh noix",
@@ -25,3 +24,5 @@ const user = {
   username: "Johnbrow",
 };
 //  evento join-room
+
+socket.emit(constants.events.JOIN_ROOM, { user, room });
