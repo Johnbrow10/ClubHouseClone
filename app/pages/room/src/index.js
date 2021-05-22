@@ -15,7 +15,7 @@ const socket = socketBuilder
   .build();
 
 const room = {
-  id: Date.now(),
+  id: '0001',
   topic: "JS Expert éh noix",
 };
 

@@ -19,10 +19,24 @@ export default class RoomsController {
 
     const updateUserData = this.#updateGlobalUserData(userId, user, roomId);
 
+    const updatedRoom = this.#joinUserRoom(socket, updatedUserData, room);
+
     console.log({ updateUserData });
 
     socket.emit(constants.event.USER_CONNECTED, data);
   }
+
+  #replyWithActiveUsers(socket, users) {
+    const event = constants.event.LOBBY_UPDATED;
+    socket.emit(event, [...users.values()]);
+  }
+
+  //  notificar todos os usuarios na sala
+  #notifyUsersOnRoom(socket, roomId, user) {
+    const event = constants.event.USER_CONNECTED;
+    socket.to(roomId).emit(event, user);
+  }
+
   //  Criando o gerenciamento de usuarios em uma sala
   #joinUserRoom(socket, user, room) {
     const roomId = room.id;
