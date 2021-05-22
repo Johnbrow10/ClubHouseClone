@@ -23,7 +23,7 @@ export default class RoomsController {
 
     socket.emit(constants.event.USER_CONNECTED, data);
   }
-//  Criando o gerenciamento de usuarios em uma sala 
+  //  Criando o gerenciamento de usuarios em uma sala
   #joinUserRoom(socket, user, room) {
     const roomId = room.id;
     const existingRoom = this.rooms.has(roomId);
@@ -50,6 +50,21 @@ export default class RoomsController {
     socket.join(roomId);
 
     return this.rooms.get(roomId);
+  }
+
+  // mapear na room parasaber o que cada caracteristica se aplica a cada usuario
+  #mapRoom(room) {
+    const users = [...room.users.values()];
+    const speakersCount = users.filter((user) => user.isSpeaker).length;
+    const featuredAttendees = users.slice(0, 3);
+    const mappedRoom = new Room({
+      ...room,
+      featuredAttendees,
+      speakersCount,
+      attendeesCount: room.users.size,
+    });
+
+    return mappedRoom;
   }
 
   // function para pedir autorização quando entrar na sala
