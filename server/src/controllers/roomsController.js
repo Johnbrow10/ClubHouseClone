@@ -13,15 +13,43 @@ export default class RoomsController {
     this.#updateGlobalUserData(id);
   }
 
-  joinRoom(socket, { user, ...room }) {
+  joinRoom(socket, { user, room }) {
     const userId = (user.id = socket.id);
     const roomId = room.id;
 
     const updateUserData = this.#updateGlobalUserData(userId, user, roomId);
 
-    console.log({updateUserData});
+    console.log({ updateUserData });
 
     socket.emit(constants.event.USER_CONNECTED, data);
+  }
+//  Criando o gerenciamento de usuarios em uma sala 
+  #joinUserRoom(socket, user, room) {
+    const roomId = room.id;
+    const existingRoom = this.rooms.has(roomId);
+    const currentRoom = existingRoom ? this.rooms.get(roomId) : {};
+    const currentUser = new Attendee({
+      ...user,
+      roomId,
+    });
+
+    // definir quem é o dono da sala
+    const [owner, users] = existingRoom
+      ? [currentRoom.owner, currentRoom.users]
+      : [currentUser, new Set()];
+
+    const updatedRoom = this.#mapRoom({
+      ...currentRoom,
+      ...room,
+      owner,
+      users: new Set([...users, ...[currentUser]]),
+    });
+
+    this.rooms.set(roomId, updatedRoom);
+
+    socket.join(roomId);
+
+    return this.rooms.get(roomId);
   }
 
   // function para pedir autorização quando entrar na sala
