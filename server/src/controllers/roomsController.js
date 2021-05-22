@@ -20,6 +20,8 @@ export default class RoomsController {
     const updateUserData = this.#updateGlobalUserData(userId, user, roomId);
 
     const updatedRoom = this.#joinUserRoom(socket, updatedUserData, room);
+    this.#notifyUsersOnRoom(socket, roomId, updatedUserData);
+    this.#replyWithActiveUsers(socket, updatedRoom.users);
 
     console.log({ updateUserData });
 
